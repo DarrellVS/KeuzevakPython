@@ -1,0 +1,25 @@
+Niveau 1
+    - 1: Een dict, hierin kun je de naam vaan de deelnemer koppelen met de window van de deelnemer
+    - 2: Een list, tuples kunnen niet worden aangepast. Een list kan dat wel.
+    - 3: Een set, hiermee vermijdt je dubbele waarden binnen de tabel.
+    - 4: Een list, hiermee is d.m.v. coordinaten ([x][y]) heel simpel een 2D list op te stellen.
+         OF gebruik een tuple wanneer er in het blok gezocht moet worden, je loopt sneller door tuples heen dan door lists.
+
+Niveau 2
+    - 1: tuple = ('een enkel element')
+    - 2: dictOfSet = {}
+    - 3: 
+        set1 = {'een', 'set', 'met', 'elementen'}
+        set2 = {'nog', 'een', 'set'}
+
+        Doorsnede: 
+            doorsnede = set1.intersection(set2)
+            Dit geeft doorsnede = {'een', 'set'}
+    
+        Vereniging:
+            vereniging = set1.union(set2)
+            Dit geeft vereniging = {'een', 'set', 'met', 'elementen', 'nog'}
+
+        Symmetric difference:
+            symmetricDifference = set1.symmetric_difference(set2)
+            Dit geeft symmetricDifference = {'elementen', 'nog'}
