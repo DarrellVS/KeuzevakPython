@@ -2,14 +2,11 @@ from math import floor
 from __ship import *
 
 class Map:
-    def __init__(self, sizes, matrix = None):
+    def __init__(self, sizes):
         self.width = sizes['mapGrid']['width']
         self.height = sizes['mapGrid']['height']
-        self.sizes = sizes;
-        if(matrix == None):
-            self.matrix = [ [ 0 for i in range(self.width) ] for j in range(self.height) ]
-        else:
-            self.matrix = matrix
+        self.sizes = sizes
+        self.matrix = [ [ 0 for i in range(self.width) ] for j in range(self.height) ]
 
     def placeShip(self, Ship, x, y):       
         # Validate if ship base is within map boundaries
@@ -35,7 +32,7 @@ class Map:
         for i in range(Ship.getLength()):
             self.matrix[y][x + i] = Ship
 
-        return True;
+        return True
 
     def _placeShipSouth(self, Ship, x, y):
         # Validate if ship length is within map boundaries
@@ -50,7 +47,7 @@ class Map:
         for i in range(Ship.getLength()):
             self.matrix[y + i][x] = Ship
 
-        return True;
+        return True
 
     def destroyShip(self, Ship):
         for x in range(self.width):
@@ -60,18 +57,44 @@ class Map:
     def checkShipAt(self, x, y): 
         return isinstance(self.matrix[y][x], Ship)
 
+    def getEntry(self, x, y):
+        return self.matrix[x][y]
+
+    def getCorrespondingMatrixIndex(self, x, y):
+        return (
+            floor(x / self.sizes['gridEntry']['width']),
+            9 - floor(y / self.sizes['gridEntry']['height'])
+        )
+
+    def getMatrix(self):
+        return self.matrix
+
+    def getShareableMatrix(self):
+        shareableMatrix = [ [ {} for i in range(self.width) ] for j in range(self.height) ]
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                # If the current element in the matrix is a ship
+                if(isinstance(self.matrix[i][j], Ship)):
+
+                    # Get the length of the ship
+                    ship = self.matrix[i][j]
+                    shareableMatrix[i][j] = {
+                        'index': ship.getIndex(),
+                        'length': ship.getLength()
+                    }
+
+        return shareableMatrix;
+
+    def setMatrixFromOpponentMatrix(self, opponentMatrix):
+        return True
+
     def print(self):
         for i in self.matrix:
             for j in i:
                 if(isinstance(j, Ship)):
-                    print(j.getLength(), end = ' ')
+                    print(j.getIndex(), end = ' ')
 
                 else:
-                    print(j, end = ' ')
+                    print('_', end = ' ')
 
-            print()
-
-    def getEntry(self, x, y):
-        x2 = floor(x / self.sizes['gridEntry']['width'])
-        y2 = 9 - floor(y / self.sizes['gridEntry']['height'])
-        return self.matrix[x2][y2]
+        print()

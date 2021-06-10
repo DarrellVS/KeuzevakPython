@@ -1,3 +1,4 @@
+from math import log
 import pyglet, sys
 from pyglet import shapes
 
@@ -5,7 +6,6 @@ from __map import *
 from __ship import *
 from __socket import *
 
-batch = pyglet.graphics.Batch()
 
 
 # Construct a sizes dictionary 
@@ -32,26 +32,31 @@ lines = {
 }
 
 
+
+
 # Initialize a Map, socket
-map = Map(sizes)
+myMap = Map(sizes)
+opponentMap = None
 socket = Socket('https://python.darrellvs.nl')
 
 # Connect the websocket to the server
-socket.connect();
+# socket.connect()
 
-# Create a pyglet window and eventloop
+# Create a pyglet window, eventloop and graphics batch
 window = pyglet.window.Window(1000, 500)
 eventLoop = pyglet.app.EventLoop()
+batch = pyglet.graphics.Batch()
+
 
 # State of ship placement
-placingFinished = False
+amountOfShips = 0;
 
 
 # Window event handlers
 @window.event
 def on_draw():
     window.clear()
-    drawGrid()
+    drawMap()
 
 @window.event
 def on_mouse_motion(x, y, dx, dy):
@@ -59,8 +64,29 @@ def on_mouse_motion(x, y, dx, dy):
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
-    if(placingFinished):
-        print(map.getEntry(x, y))
+    global amountOfShips
+    index = myMap.getCorrespondingMatrixIndex(x, y);
+
+    if(amountOfShips == 8):
+        if(opponentMap is None):
+            print("Your opponent has not yet finished placing all of their ships, please wait.")
+
+        else:
+            print(opponentMap.getEntry(index[0], index[1]))
+
+    else:
+        couldPlace = myMap.placeShip(MediumShip('south'), index[0], index[1])
+
+        if(couldPlace): 
+            amountOfShips += 1
+
+            if(amountOfShips == 8):
+                print('placing finished.')
+                myMap.print();
+                print(myMap.getShareableMatrix())
+
+        else: 
+            print("Could not place ship due to collision or map boudnaries.") 
 
 @window.event
 def on_close():
@@ -70,22 +96,47 @@ def on_close():
 
 
 
-def drawGrid():
+def drawMap():
     entryWidth = sizes['gridEntry']['width']
     entryHeight = sizes['gridEntry']['height']
+    crosses = [ [ [0,0] for i in range(sizes['mapGrid']['width']) ] for j in range(sizes['mapGrid']['height']) ]
 
     # For each grid item width
     for i in range(sizes['mapGrid']['width'] - 1):
-        x = round(i * entryWidth + entryWidth);
+        x = round(i * entryWidth + entryWidth)
         lines['horizontal'][i] = shapes.Line(x, 0, x, sizes['window']['height'], 1, (150, 150, 150), batch = batch)
 
     # For each grid item height
     for i in range(sizes['mapGrid']['height'] - 1):
-        y = round(i * entryHeight + entryHeight);
+        y = round(i * entryHeight + entryHeight)
         lines['vertical'][i] = shapes.Line(0, y, sizes['window']['width'], y, 1, (150, 150, 150), batch = batch)
 
-    batch.draw()
+    # Get matrix from map object
+    matrix = myMap.getMatrix()
 
+    # loop over matrix and place ship crosses wherever needed
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+
+            # If the current element in the matrix is a ship
+            if(isinstance(matrix[i][j], Ship)):
+
+                # Get the length of the ship
+                length = matrix[i][j].getLength()
+
+                # Construct the cross' x and y position (top left corner of grid entry)
+                x2 = entryWidth * j
+                y2 = entryHeight * (9 - i)
+
+                # Construct a color based on the ship's length
+                color = (0, 255, 0) if length == 1 else (0, 0, 255) if length == 2 else (255, 0, 0)
+
+                # Draw crosses
+                crosses[i][j][0] = shapes.Line(x2, y2, x2 + entryWidth, y2 + entryHeight, 1, color, batch = batch)
+                crosses[i][j][1] = shapes.Line(x2 + entryWidth, y2, x2, y2 + entryHeight, 1, color, batch = batch)
+
+    # Draw the batch
+    batch.draw()
 
 
 pyglet.app.run()

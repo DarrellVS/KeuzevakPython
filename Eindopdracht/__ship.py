@@ -1,26 +1,32 @@
+index = 0
+
 class Ship:
     def __init__(self, length, orientation):
+        global index
+
         self.length = length
         self.orientation = orientation
-        print('New ship initiated')
+        self.index = index
+        print(index)
+        index += 1
+
+    def getIndex(self):
+        return self.index
+
+    def getLength(self):
+        return self.length
+
+    def getOrientation(self):
+        return self.orientation
 
 class SmallShip(Ship):
     def __init__(self, orientation):
         super().__init__(1, orientation)
-
-    def getLength(self):
-        return self.length
         
 class MediumShip(Ship):
     def __init__(self, orientation):
         super().__init__(2, orientation)
 
-    def getLength(self):
-        return self.length
-
 class LargeShip(Ship):
     def __init__(self, orientation):
         super().__init__(3, orientation)
-
-    def getLength(self):
-        return self.length
