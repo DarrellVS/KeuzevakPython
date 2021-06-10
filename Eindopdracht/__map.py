@@ -1,10 +1,15 @@
+from math import floor
 from __ship import *
 
 class Map:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.matrix = [ [ 0 for i in range(width) ] for j in range(height) ]
+    def __init__(self, sizes, matrix = None):
+        self.width = sizes['mapGrid']['width']
+        self.height = sizes['mapGrid']['height']
+        self.sizes = sizes;
+        if(matrix == None):
+            self.matrix = [ [ 0 for i in range(self.width) ] for j in range(self.height) ]
+        else:
+            self.matrix = matrix
 
     def placeShip(self, Ship, x, y):       
         # Validate if ship base is within map boundaries
@@ -50,7 +55,7 @@ class Map:
     def destroyShip(self, Ship):
         for x in range(self.width):
             for y in range(self.height):
-                if(self.matrix[y][x] is not 0): self.matrix[y][x] = 0 
+                if(self.matrix[y][x] != 0): self.matrix[y][x] = 0 
 
     def checkShipAt(self, x, y): 
         return isinstance(self.matrix[y][x], Ship)
@@ -65,3 +70,8 @@ class Map:
                     print(j, end = ' ')
 
             print()
+
+    def getEntry(self, x, y):
+        x2 = floor(x / self.sizes['gridEntry']['width'])
+        y2 = 9 - floor(y / self.sizes['gridEntry']['height'])
+        return self.matrix[x2][y2]
