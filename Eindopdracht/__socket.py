@@ -36,7 +36,6 @@ class Socket:
         # Upon receiving the semafore
         @self.sio.on('semafore')
         def on_message():
-            print('bruh')
             self.semafore = True
 
     # Connect to the host (socket io server) 
