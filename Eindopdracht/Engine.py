@@ -36,20 +36,20 @@ lines = {
 
 # Initialize a Map, socket
 myMap = Map(sizes)
-opponentMap = None
-socket = Socket('https://python.darrellvs.nl')
+socket = Socket('https://python.darrellvs.nl', myMap, sizes)
 
 # Connect the websocket to the server
-# socket.connect()
+socket.connect()
 
 # Create a pyglet window, eventloop and graphics batch
 window = pyglet.window.Window(1000, 500)
 eventLoop = pyglet.app.EventLoop()
 batch = pyglet.graphics.Batch()
 
-
 # State of ship placement
 amountOfShips = 0;
+maxShips = 1;
+
 
 
 # Window event handlers
@@ -67,24 +67,41 @@ def on_mouse_press(x, y, button, modifiers):
     global amountOfShips
     index = myMap.getCorrespondingMatrixIndex(x, y);
 
-    if(amountOfShips == 8):
-        if(opponentMap is None):
+    if(amountOfShips == maxShips):
+        if(socket.getOpponentMap() is None):
             print("Your opponent has not yet finished placing all of their ships, please wait.")
 
         else:
-            print(opponentMap.getEntry(index[0], index[1]))
+            # The opponent has finished
+            opponentMap = socket.getOpponentMap()
+            clickedElement = opponentMap.getEntry(index[0], index[1])
+
+            # If the clicked element is a ship instance
+            if(isinstance(clickedElement, Ship)):
+
+                # If the element is not yet destroyed
+                if(clickedElement.isDestroyed() == False):
+                    # Destroy the ship
+                    opponentMap.destroyShip(clickedElement)
+                    opponentMap.print()
+                    socket.destroyOpponentShip([index[0], index[1]])
 
     else:
-        couldPlace = myMap.placeShip(MediumShip('south'), index[0], index[1])
+        # Place ship if it can
+        couldPlace = myMap.placeShip(MediumShip('east'), index[0], index[1])
 
+        # If it placed the ship
         if(couldPlace): 
             amountOfShips += 1
 
-            if(amountOfShips == 8):
+            # If the player has finished placing
+            if(amountOfShips == maxShips):
+                # Get the shareable map from the Map object and send it to the server
                 print('placing finished.')
-                myMap.print();
-                print(myMap.getShareableMatrix())
+                shareableMatrix = myMap.getShareableMatrix()
+                socket.finishedPlacement(shareableMatrix)
 
+        # If it did not place the ship
         else: 
             print("Could not place ship due to collision or map boudnaries.") 
 
@@ -99,7 +116,7 @@ def on_close():
 def drawMap():
     entryWidth = sizes['gridEntry']['width']
     entryHeight = sizes['gridEntry']['height']
-    crosses = [ [ [0,0] for i in range(sizes['mapGrid']['width']) ] for j in range(sizes['mapGrid']['height']) ]
+    shapesList = [ [ [0,0] for i in range(sizes['mapGrid']['width']) ] for j in range(sizes['mapGrid']['height']) ]
 
     # For each grid item width
     for i in range(sizes['mapGrid']['width'] - 1):
@@ -131,12 +148,15 @@ def drawMap():
                 # Construct a color based on the ship's length
                 color = (0, 255, 0) if length == 1 else (0, 0, 255) if length == 2 else (255, 0, 0)
 
-                # Draw crosses
-                crosses[i][j][0] = shapes.Line(x2, y2, x2 + entryWidth, y2 + entryHeight, 1, color, batch = batch)
-                crosses[i][j][1] = shapes.Line(x2 + entryWidth, y2, x2, y2 + entryHeight, 1, color, batch = batch)
+                if(matrix[i][j].isDestroyed()):
+                    # Draw square if ship is destroyed
+                    shapesList[i][j][0] = shapes.Rectangle(x2 + 10, y2 + 10, entryWidth - 20, entryHeight - 20, color, batch = batch)
+                else:
+                    # Draw cross
+                    shapesList[i][j][0] = shapes.Line(x2, y2, x2 + entryWidth, y2 + entryHeight, 1, color, batch = batch)
+                    shapesList[i][j][1] = shapes.Line(x2 + entryWidth, y2, x2, y2 + entryHeight, 1, color, batch = batch)
 
     # Draw the batch
     batch.draw()
-
 
 pyglet.app.run()
