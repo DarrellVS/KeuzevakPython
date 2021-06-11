@@ -64,10 +64,13 @@ class Map:
 
                     # If the index matches with the provided ship
                     if(element.getIndex() == ship.getIndex()):
+
+                        # Only add to destoryed ships counter if element is unique
                         if(not element.getIndex() in passedIndices): 
                             passedIndices.append(element.getIndex())
                             self.destroyedShips += 1
 
+                        # Destroy the ship
                         element.destroy()
 
     def checkShipAt(self, x, y): 
@@ -131,7 +134,7 @@ class Map:
         for i in self.matrix:
             for j in i:
                 if(isinstance(j, Ship)):
-                    print(j.isDestroyed(), end = ' ')
+                    print('0' if j.isDestroyed() else '1' , end = ' ')
 
                 else:
                     print('_', end = ' ')

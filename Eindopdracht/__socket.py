@@ -7,9 +7,9 @@ class Socket:
         self.sio = socketio.Client()
         self.opponentMap = None
         self.sizes = sizes
-        self.opponentMapRetreived = False;
+        self.opponentMapRetreived = False
         self.myMap = myMap
-        self.winner = None;
+        self.winner = None
 
         @self.sio.event
         def connect():
@@ -18,8 +18,8 @@ class Socket:
         # Upon receiving a message with label bruhtering
         @self.sio.on('shareable-matrix')
         def on_message(shareableMatrix):
-            m = Map(self.sizes);
-            self.opponentMap = m.getMatrixFromOpponentMap(shareableMatrix);
+            m = Map(self.sizes)
+            self.opponentMap = m.getMatrixFromOpponentMap(shareableMatrix)
 
         @self.sio.on('destroy-ship')
         def on_message(index):
@@ -50,4 +50,4 @@ class Socket:
         return self.opponentMap
 
     def getWinner(self):
-        return self.winner;
+        return self.winner
