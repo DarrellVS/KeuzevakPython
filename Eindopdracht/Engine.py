@@ -75,7 +75,13 @@ def on_mouse_press(x, y, button, modifiers):
             print("Your opponent has not yet finished placing all of their ships, please wait.")
 
         else:
-            # The opponent has finished
+            # The opponent has finished placing their ships
+
+            # Validate if you have the semafore
+            if(not socket.hasSemafore()):
+                print('Its not your turn yet, please wait :)')
+                return;
+
             opponentMap = socket.getOpponentMap()
             clickedElement = opponentMap.getEntry(index[0], index[1])
 
@@ -91,6 +97,10 @@ def on_mouse_press(x, y, button, modifiers):
                     # If player has won 
                     if(opponentMap.getAmountOfDestroyedShips() == maxShips):
                         socket.win() # Emit win event through socket
+
+
+            # Pass the semafore to the opponent
+            socket.sendSemafore();
 
     else:
         # Filter the ships placed list
