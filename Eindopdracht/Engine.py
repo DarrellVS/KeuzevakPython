@@ -76,12 +76,12 @@ def on_mouse_press(x, y, button, modifiers):
 
         else:
             # The opponent has finished placing their ships
-
             # Validate if you have the semafore
             if(not socket.hasSemafore()):
                 print('Its not your turn yet, please wait :)')
                 return;
 
+            # Get the opponent's map
             opponentMap = socket.getOpponentMap()
             clickedElement = opponentMap.getEntry(index[0], index[1])
 
