@@ -1,6 +1,7 @@
 from math import log
 import pyglet, sys
 from pyglet import shapes
+from pyglet.window import key
 
 from __map import *
 from __ship import *
@@ -48,23 +49,23 @@ batch = pyglet.graphics.Batch()
 
 # State of ship placement
 amountOfShips = 0;
-maxShips = 1;
+maxShips = 8;
+
+# 2 Small ships, 3 Medium and Large ships
+ships = [None, [False, False], [False, False, False], [False, False, False]]
+orientation = 'south'
+shipLength = 1
 
 
 
 # Window event handlers
 @window.event
 def on_draw():
-    window.clear()
-    drawMap()
-
-@window.event
-def on_mouse_motion(x, y, dx, dy):
-    return
+    drawElements();
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
-    global amountOfShips
+    global amountOfShips, orientation, shipLength
     index = myMap.getCorrespondingMatrixIndex(x, y);
 
     if(amountOfShips == maxShips):
@@ -87,8 +88,20 @@ def on_mouse_press(x, y, button, modifiers):
                     socket.destroyOpponentShip([index[0], index[1]])
 
     else:
+        # Filter the ships placed list
+        filteredList = list(filter(lambda item: item == False, ships[shipLength]))
+
+        # If all ships for the selected length have been placed
+        if(len(filteredList) == 0):
+            return print("You have already placed the maximum amount of ships with length", shipLength)
+
+        # Set next item in ships placed list for ship length to True
+        ships[shipLength][len(ships[shipLength]) - len(filteredList)] = True;
+
         # Place ship if it can
-        couldPlace = myMap.placeShip(MediumShip('east'), index[0], index[1])
+        couldPlace = myMap.placeShip(
+            SmallShip(orientation) if shipLength == 1 else MediumShip(orientation) if shipLength == 2 else LargeShip(orientation)
+        , index[0], index[1])
 
         # If it placed the ship
         if(couldPlace): 
@@ -111,12 +124,25 @@ def on_close():
     socket.disconnect()
     print('Running services closed successfully, exiting...')
 
+@window.event
+def on_key_press(symbol, modifiers):
+    global orientation, shipLength
+    if(symbol == key.DOWN): orientation = 'south'
+    if(symbol == key.RIGHT): orientation = 'east'
+    if(symbol == key._1): shipLength = 1
+    if(symbol == key._2): shipLength = 2
+    if(symbol == key._3): shipLength = 3
 
+
+
+def drawElements(dt = None):
+    window.clear()
+    drawMap()
 
 def drawMap():
     entryWidth = sizes['gridEntry']['width']
     entryHeight = sizes['gridEntry']['height']
-    shapesList = [ [ [0,0] for i in range(sizes['mapGrid']['width']) ] for j in range(sizes['mapGrid']['height']) ]
+    shapesList = []
 
     # For each grid item width
     for i in range(sizes['mapGrid']['width'] - 1):
@@ -150,13 +176,14 @@ def drawMap():
 
                 if(matrix[i][j].isDestroyed()):
                     # Draw square if ship is destroyed
-                    shapesList[i][j][0] = shapes.Rectangle(x2 + 10, y2 + 10, entryWidth - 20, entryHeight - 20, color, batch = batch)
+                    shapesList.append(shapes.Rectangle(x2 + 10, y2 + 10, entryWidth - 20, entryHeight - 20, color, batch = batch))
                 else:
                     # Draw cross
-                    shapesList[i][j][0] = shapes.Line(x2, y2, x2 + entryWidth, y2 + entryHeight, 1, color, batch = batch)
-                    shapesList[i][j][1] = shapes.Line(x2 + entryWidth, y2, x2, y2 + entryHeight, 1, color, batch = batch)
+                    shapesList.append(shapes.Line(x2, y2, x2 + entryWidth, y2 + entryHeight, 1, color, batch = batch))
+                    shapesList.append(shapes.Line(x2 + entryWidth, y2, x2, y2 + entryHeight, 1, color, batch = batch))
 
     # Draw the batch
     batch.draw()
 
+pyglet.clock.schedule_interval(drawElements, 1/30.0)
 pyglet.app.run()
