@@ -35,8 +35,10 @@ lines = {
 
 
 
-# Initialize a Map, socket
+# Initialize a Map
 myMap = Map(sizes)
+
+# Initialize a socket
 socket = Socket('https://python.darrellvs.nl', myMap, sizes)
 
 # Connect the websocket to the server
@@ -65,7 +67,7 @@ def on_draw():
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
-    global amountOfShips, orientation, shipLength
+    global amountOfShips, orientation, shipLength, winner
     index = myMap.getCorrespondingMatrixIndex(x, y);
 
     if(amountOfShips == maxShips):
@@ -84,8 +86,11 @@ def on_mouse_press(x, y, button, modifiers):
                 if(clickedElement.isDestroyed() == False):
                     # Destroy the ship
                     opponentMap.destroyShip(clickedElement)
-                    opponentMap.print()
                     socket.destroyOpponentShip([index[0], index[1]])
+
+                    # Check if player has won 
+                    if(opponentMap.getAmountOfDestroyedShips() == maxShips):
+                        socket.win();
 
     else:
         # Filter the ships placed list
@@ -138,6 +143,7 @@ def on_key_press(symbol, modifiers):
 def drawElements(dt = None):
     window.clear()
     drawMap()
+    drawLabels()
 
 def drawMap():
     entryWidth = sizes['gridEntry']['width']
@@ -184,6 +190,16 @@ def drawMap():
 
     # Draw the batch
     batch.draw()
+
+def drawLabels():
+    if(socket.getWinner() is not None):
+        label = pyglet.text.Label( socket.getWinner() + " won!",
+                font_name='Arial',
+                font_size=36,
+                x=window.width//2, y=window.height//2,
+                anchor_x='center', anchor_y='center')
+                
+        label.draw()
 
 pyglet.clock.schedule_interval(drawElements, 1/30.0)
 pyglet.app.run()

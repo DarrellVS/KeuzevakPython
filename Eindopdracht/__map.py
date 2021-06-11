@@ -51,6 +51,8 @@ class Map:
         return True
 
     def destroyShip(self, ship):
+        passedIndices = []
+
         for x in range(self.width):
             for y in range(self.height):
 
@@ -62,8 +64,11 @@ class Map:
 
                     # If the index matches with the provided ship
                     if(element.getIndex() == ship.getIndex()):
+                        if(not element.getIndex() in passedIndices): 
+                            passedIndices.append(element.getIndex())
+                            self.destroyedShips += 1
+
                         element.destroy()
-                        self.destroyedShips += 1
 
     def checkShipAt(self, x, y): 
         return isinstance(self.matrix[y][x], Ship)

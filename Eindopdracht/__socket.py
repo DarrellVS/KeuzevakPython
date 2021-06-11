@@ -9,6 +9,7 @@ class Socket:
         self.sizes = sizes
         self.opponentMapRetreived = False;
         self.myMap = myMap
+        self.winner = None;
 
         @self.sio.event
         def connect():
@@ -22,10 +23,12 @@ class Socket:
 
         @self.sio.on('destroy-ship')
         def on_message(index):
-            print('Destroying ship @ ', index)
             entry = myMap.getEntry(index[0], index[1])
-            print(entry)
             self.myMap.destroyShip(entry)
+
+        @self.sio.on('opponent-wins')
+        def on_message():
+            self.winner = 'Opponent'
 
     def connect(self):
         self.sio.connect(self.host)
@@ -39,5 +42,12 @@ class Socket:
     def destroyOpponentShip(self, index):
         self.sio.emit('destroy-opponent-ship', index)
 
+    def win(self):
+        self.winner = 'You'
+        self.sio.emit('player-wins')
+
     def getOpponentMap(self):
         return self.opponentMap
+
+    def getWinner(self):
+        return self.winner;
