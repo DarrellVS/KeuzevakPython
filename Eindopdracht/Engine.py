@@ -50,8 +50,8 @@ eventLoop = pyglet.app.EventLoop()
 batch = pyglet.graphics.Batch()
 
 # State of ship placement
-amountOfShips = 0;
-maxShips = 8;
+amountOfShips = 0
+maxShips = 8
 
 # 2 Small ships, 3 Medium and Large ships
 ships = [None, [False, False], [False, False, False], [False, False, False]]
@@ -63,12 +63,12 @@ shipLength = 1
 # Window event handlers
 @window.event
 def on_draw():
-    drawElements();
+    drawElements()
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
     global amountOfShips, orientation, shipLength, winner
-    index = myMap.getCorrespondingMatrixIndex(x, y);
+    index = myMap.getCorrespondingMatrixIndex(x, y)
 
     if(amountOfShips == maxShips):
         if(socket.getOpponentMap() is None):
@@ -88,9 +88,9 @@ def on_mouse_press(x, y, button, modifiers):
                     opponentMap.destroyShip(clickedElement)
                     socket.destroyOpponentShip([index[0], index[1]])
 
-                    # Check if player has won 
+                    # If player has won 
                     if(opponentMap.getAmountOfDestroyedShips() == maxShips):
-                        socket.win();
+                        socket.win() # Emit win event through socket
 
     else:
         # Filter the ships placed list
@@ -101,7 +101,7 @@ def on_mouse_press(x, y, button, modifiers):
             return print("You have already placed the maximum amount of ships with length", shipLength)
 
         # Set next item in ships placed list for ship length to True
-        ships[shipLength][len(ships[shipLength]) - len(filteredList)] = True;
+        ships[shipLength][len(ships[shipLength]) - len(filteredList)] = True
 
         # Place ship if it can
         couldPlace = myMap.placeShip(
