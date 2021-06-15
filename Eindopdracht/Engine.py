@@ -39,7 +39,7 @@ lines = {
 myMap = Map(sizes)
 
 # Initialize a socket
-socket = Socket('https://python.darrellvs.nl', myMap, sizes)
+socket = Socket('http://localhost:3012', myMap, sizes)
 
 # Connect the websocket to the server
 socket.connect()
