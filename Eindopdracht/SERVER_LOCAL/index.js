@@ -1,14 +1,7 @@
-var fs = require('fs')
 const cors = require('cors')
 const path = require('path')
-// const https = require('https')
 const http = require('http')
 const express = require('express')
-
-// const options = {
-//     key: fs.readFileSync('/etc/cloudflare/darrellvs.nl.key'),
-//     cert: fs.readFileSync('/etc/cloudflare/darrellvs.nl.pem')
-// }
 
 const app = express()
 const server = http.createServer(app)
