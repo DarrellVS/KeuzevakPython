@@ -10,6 +10,7 @@ class Socket:
         self.myMap = myMap                  # Holds tha player's map
         self.winner = None                  # Holds the winner of the game
         self.semafore = False;           # Keep track of playing order
+        self.gameFinished = False
 
         # Connection event
         @self.sio.event
@@ -31,6 +32,7 @@ class Socket:
         # The opponent wins
         @self.sio.on('opponent-wins')
         def on_message():
+            self.gameFinished = True
             self.winner = 'Opponent'
 
         # Upon receiving the semafore
@@ -56,6 +58,7 @@ class Socket:
 
     # Emit event upon game win
     def win(self):
+        self.gameFinished = True
         self.winner = 'You'             # You have won
         self.sio.emit('player-wins')    # Emit an event to the socket io server
 
@@ -73,3 +76,6 @@ class Socket:
 
     def hasSemafore(self):
         return self.semafore
+
+    def getGameFinished(self):
+        return self.gameFinished
