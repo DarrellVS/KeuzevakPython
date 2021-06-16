@@ -33,12 +33,12 @@ class Ship:
 
 class SmallShip(Ship):
     def __init__(self, orientation, index = None):
-        super().__init__(1, orientation, index)
+        super().__init__(2, orientation, index)
         
 class MediumShip(Ship):
     def __init__(self, orientation, index = None):
-        super().__init__(2, orientation, index)
+        super().__init__(3, orientation, index)
 
 class LargeShip(Ship):
     def __init__(self, orientation, index = None):
-        super().__init__(3, orientation, index)
+        super().__init__(4, orientation, index)
