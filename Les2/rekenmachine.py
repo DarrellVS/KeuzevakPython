@@ -1,4 +1,8 @@
+import math
+
 memory = {}
+
+validCommands = ["Add", "Subtract", "Multiply", "Divide", "Sin", "Arcsin", "Cos", "Arccos", "Tan", "Arctan", "Sqrt", "Exp", "Ln"]
 
 
 def getValueForInput(input):
@@ -17,6 +21,9 @@ def getInput():
     )
     return (num1,num2)
 
+def getSingleInput():
+    return getValueForInput(input("Enter a number: "))
+
 def store():
     name = input("Provide a key on which to store the value: ")
     value = int(input("Enter a value to store: "))
@@ -27,7 +34,8 @@ def store():
 
 while True:
     # Take input from the user  
-    select = input("Please select operation -\n Add\n Subtract\n Multiply\n Divide\n Store\n") 
+    commandStr = "\n - ".join(validCommands)
+    select = input(f"Please select an operation: \n - {commandStr}\n")
     
     if select == "Add": 
         inpt = getInput()
@@ -38,12 +46,39 @@ while True:
         print(inpt[0] - inpt[1]) 
     
     elif select == "Multiply": 
-        input = getInput()
+        inpt = getInput()
         print(inpt[0] * inpt[1]) 
     
     elif select == "Divide": 
-        input = getInput()
-        print(inpt[0] / inpt[1]) 
+        inpt = getInput()
+        print(inpt[0] / inpt[1])
+
+    elif select == "Sin": 
+        print(math.sin(getSingleInput()))
+        
+    elif select == "Arcsin": 
+        print(math.asin(getSingleInput()))
+
+    elif select == "Cos": 
+        print(math.cos(getSingleInput()))
+
+    elif select == "Arccos": 
+        print(math.acos(getSingleInput()))
+
+    elif select == "Tan": 
+        print(math.tan(getSingleInput()))
+
+    elif select == "Arctan": 
+        print(math.atan(getSingleInput()))
+
+    elif select == "Sqrt": 
+        print(math.sqrt(getSingleInput()))
+
+    elif select == "Exp": 
+        print(math.exp(getSingleInput()))
+
+    elif select == "Ln": 
+        print(math.log(getSingleInput()))
 
     elif select == "Store":
         store()
