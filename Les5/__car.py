@@ -17,3 +17,9 @@ class Car:
 
     def print(self):
         print(f"Im a {self.brand} with {self.acceleration} m/s^2 acceleration and {self.maxSpeed} m/s maxSpeed. Im going {self.speed} m/s and am located at {self.position}")
+
+    def getColor(self):
+        return self.color
+
+    def getPosition(self):
+        return self.position
